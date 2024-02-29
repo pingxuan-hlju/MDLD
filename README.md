@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is code of MDLD (“Two enhanced features to predict thedisease-associated lncRNAs”).
+This is code of MDLD (“Two enhanced features to predict the disease-associated lncRNAs”).
 
 ## Dataset
 
