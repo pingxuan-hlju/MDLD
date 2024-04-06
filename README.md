@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is code of MDLD (“{Mask-Guided Target Node Feature Learning and Dynamic Detailed Feature Enhancement for LncRNA-Disease Association Prediction”).
+This is code of MDLD (“Mask-Guided Target Node Feature Learning and Dynamic Detailed Feature Enhancement for LncRNA-Disease Association Prediction”).
 
 ## Dataset
 
