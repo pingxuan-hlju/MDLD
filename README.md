@@ -6,13 +6,15 @@ This is code of MDLD (“Mask-Guided Target Node Feature Learning and Dynamic De
 
 ## Dataset
 
-| File_name                  | Data_type       | Source                                                       |
-| -------------------------- | --------------- | ------------------------------------------------------------ |
-| dis_sim_matrix_process.txt | disease-disease | [MeSH](https://www.nlm.nih.gov/mesh/meshhome.html)           |
-| lnc_dis_association.txt    | lncRNA-disease  | [LncRNADisease](https://www.cuilab.cn/lncrnadisease)         |
-| mi_dis.txt                 | miRNA-disease   | [HMDD](https://www.cuilab.cn/hmdd)                           |
-| lnc_mi.txt                 | lncRNA-miRNA    | [starBase](https://rnasysu.com/encori/)                      |
-| lnc_sim.txt                | lncRNA-lncRNA   | [Chen *et al.*](https://www.nature.com/articles/srep11338)$^{1}$ |
+| File_name                  | Data_type       | Source                                                       |Introduction                                |
+| -------------------------- | --------------- | ------------------------------------------------------------ | -------------------------------------------|
+| dis_sim_matrix_process.txt | disease-disease | [MeSH](https://www.nlm.nih.gov/mesh/meshhome.html)           |Similarity matrix of diseases               |
+| lnc_dis_association.txt    | lncRNA-disease  | [LncRNADisease](https://www.cuilab.cn/lncrnadisease)         |Association matrix of diseases and lncRNA, where a value of 1 indicates a validated association, and 0 indicates no validated association|
+| mi_dis.txt                 | miRNA-disease   | [HMDD](https://www.cuilab.cn/hmdd)                           |Association matrix of miRNA and diseases, where a value of 1 indicates a validated association, and 0 indicates no validated association|
+| lnc_mi.txt                 | lncRNA-miRNA    | [starBase](https://rnasysu.com/encori/)                      |Interaction matrix of lncRNA and miRNA, where a value of 1 indicates a validated interaction, and 0 indicates no validated interaction|
+| lnc_sim.txt                | lncRNA-lncRNA   | [Chen *et al.*](https://www.nature.com/articles/srep11338)$^{1}$ |Similarity matrix of lncRNA, obtained by calculating the similarity of diseases associated with two lncRNAs, dynamically calculated during the training process|
+| lncRNA_name.txt                | lncRNA   | [LncRNADisease](https://www.cuilab.cn/lncrnadisease) |Name of the lncRNA|
+| disease_name.txt                | disease   | [LncRNADisease](https://www.cuilab.cn/lncrnadisease) |Name of the disease|
 
 (1) Chen, X., Clarence Yan, C., Luo, C. *et al.* Constructing lncRNA Functional Similarity Network Based on lncRNA-Disease Associations and Disease Semantic Similarity. *Sci Rep* **5**, 11338 (2015).
 
