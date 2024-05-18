@@ -120,14 +120,3 @@ def calculate_sim(interaction, original_sim):
                         sim_sum = sim_sum + np.max(original_sim[l2_index[0][l]][l1_index[0]])
                     target_sim[i][j] = sim_sum / (l1_num + l2_num)
     return target_sim
-
-
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# lnc_dis, dis_dis, mi_dis, lnc_mi = load_data()
-# train_index, test_index = split_dataset_final(lnc_dis)
-# features = create_feature_matrix_final(lnc_dis, dis_dis, mi_dis, lnc_mi, device)
-# features1 = create_feature_matrix(lnc_dis, dis_dis, mi_dis, lnc_mi, train_index, device)
-# print(train_index)
-# print(train_index.shape)
-# print(test_index)
-# print(test_index.shape)
