@@ -21,10 +21,10 @@ This is code of MDLD (“Mask-Guided Target Node Feature Learning and Dynamic De
 # File
 
 ```markdown
--utils : data preprocessing,parameters,experimental evaluation						
--data : data set						
--models : build model						
--main : model training and test						
+-utils : data preprocessing,parameters et al.					
+-data : Dataset used in the research						
+-models :  scripts for implementation of the model					
+-main : scripts for model training and testing						
 ```
 
 ## Environment
