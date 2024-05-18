@@ -8,7 +8,7 @@ This is code of MDLD (“Mask-Guided Target Node Feature Learning and Dynamic De
 
 | File_name                  | Data_type       | Source                                                       |Introduction                                |
 | -------------------------- | --------------- | ------------------------------------------------------------ | -------------------------------------------|
-| dis_sim_matrix_process.txt | disease-disease | [MeSH](https://www.nlm.nih.gov/mesh/meshhome.html)           |Similarity matrix of diseases               |
+| dis_sim_matrix_process.txt | disease-disease | [MeSH](https://www.nlm.nih.gov/mesh/meshhome.html)           |Similarity matrix of diseases,where the values indicate the degree of similarity between diseases|
 | lnc_dis_association.txt    | lncRNA-disease  | [LncRNADisease](https://www.cuilab.cn/lncrnadisease)         |Association matrix of diseases and lncRNA, where a value of 1 indicates a validated association, and 0 indicates no validated association|
 | mi_dis.txt                 | miRNA-disease   | [HMDD](https://www.cuilab.cn/hmdd)                           |Association matrix of miRNA and diseases, where a value of 1 indicates a validated association, and 0 indicates no validated association|
 | lnc_mi.txt                 | lncRNA-miRNA    | [starBase](https://rnasysu.com/encori/)                      |Interaction matrix of lncRNA and miRNA, where a value of 1 indicates a validated interaction, and 0 indicates no validated interaction|
