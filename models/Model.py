@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .GCN import GCN, DRGCN
+from .GCN import GCN, GCNDR
 from .CNN import CNN
 from .attention import Attention
 
@@ -9,7 +9,7 @@ class Model(nn.Module):
     def __init__(self, dropout):
         super().__init__()
         self.gcn = GCN()
-        self.dr_gcn = DRGCN(512, 512, 2, 0.4)
+        self.dr_gcn = GCNDR(512, 512, 2, 0.4)
         self.cnn_encoder = CNN(2, 2, 1, 3)
         self.cnn_gcn = CNN(2, 2, 1, 3)
         self.att = Attention(1000, 1000, 100, dropout)

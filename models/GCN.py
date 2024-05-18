@@ -52,7 +52,7 @@ class GCN(nn.Module):
         return feat_conv
 
 
-class DRGCN(nn.Module):
+class GCNDR(nn.Module):
     def __init__(
             self,
             in_feats,
