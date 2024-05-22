@@ -1,11 +1,13 @@
 import torch
 import torch.nn as nn
-from .GCN import GCN, GCNDR
-from .CNN import CNN
+from .gcn import GCN, GCNDR
+from .cnn import CNN
 from .attention import Attention
 
 
 class Model(nn.Module):
+    """Connect the modules according to Figure 1 to implement the model."""
+
     def __init__(self, dropout):
         super().__init__()
         self.gcn = GCN()
@@ -34,7 +36,6 @@ class Model(nn.Module):
             nn.LeakyReLU(),
             nn.Linear(100, 2, bias=True),
         )
-        # 初始化模型参数
         self.init_parameters()
 
     def init_parameters(self):
@@ -44,15 +45,14 @@ class Model(nn.Module):
                 nn.init.constant_(module.bias, 0)
 
     def forward(self, feat, features, x, y):
-        # # # dr_gcn
+        # gcndr
         feat_gcn = self.dr_gcn(features)
         pair_ld = torch.cat((feat_gcn[x], feat_gcn[y + 240]), 1)
         pair_ld = pair_ld.view(x.shape[0], 1, 2, feat_gcn.shape[1])
         ld = self.cnn_gcn(pair_ld)
         ld = self.fc_gcn(ld)
-        # # pre = self.fc(ld)
 
-        # mask_trans
+        # hgmt
         feat = torch.cat((feat, features), dim=1)
         pair_l_en = feat[x]
         pair_d_en = feat[y + 240]
@@ -60,9 +60,8 @@ class Model(nn.Module):
         pair_ld_en = pair_ld_en.view(x.shape[0], 1, 2, feat.shape[1])
         ld_en = self.cnn_encoder(pair_ld_en)
         ld_en = self.fc_encoder(ld_en)
-        # pre = self.fc(ld_en)
 
-        # Attention
+        # perspective-level attention
         ld, ld_en = self.att(ld, ld_en, x, y)
 
         final_ld = torch.cat((ld_en, ld), 1)

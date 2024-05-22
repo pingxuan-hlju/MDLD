@@ -52,7 +52,7 @@ def main(args):
         model.load_state_dict(best_model_state_dict)
         model.eval()
         feat = model.get_embeds(features)
-        # Overall model training
+        # Overall model training and testing
         train(feat, train_set, test_set, val_set, args.lr_fc, args.lr_wait_fc, device, fold, train_index,
               features, args.lr_scheduler, args.early_stopping, args.dropout)
 

@@ -4,10 +4,11 @@ import torch.nn as nn
 from .loss_func import sce_loss
 from .transformer import set_encoder_model, set_decoder_model
 from .position import GraphNodeFeature
-import math
 
 
 class PreModel(nn.Module):
+    """Implements heterogeneous graph masked transformer autoencoder."""
+
     def __init__(self,
                  args,
                  ):
@@ -46,18 +47,13 @@ class PreModel(nn.Module):
         self._leave_unchanged = args.leave_unchanged
         assert self._replace_rate + self._leave_unchanged < 1, "Replace rate + leave_unchanged must be smaller than 1"
 
-    #     self.init_parameters()
-    #
-    # def init_parameters(self):
-    #     for module in self.modules():
-    #         if isinstance(module, nn.Linear):
-    #             nn.init.xavier_uniform_(module.weight, gain=nn.init.calculate_gain('leaky_relu'))
-
     def forward(self, features, **kwargs):
         loss, feat_recon, enc_out, mask_nodes = self.mask_attr_restoration(features, kwargs.get("epoch", None))
         return loss, feat_recon, enc_out, mask_nodes
 
     def get_mask_rate(self, input_mask_rate, get_min=False, epoch=None):
+        """Dynamically adjust the masking rate"""
+
         try:
             return float(input_mask_rate)
         except ValueError:
@@ -85,6 +81,8 @@ class PreModel(nn.Module):
                 raise NotImplementedError
 
     def encoding_mask_noise(self, x, mask_rate):
+        """Select the masked nodes and unmasked nodes, and perform the masking operation."""
+
         num_nodes = x.shape[0] - 495
         perm = torch.randperm(num_nodes, device=x.device)
 
@@ -110,25 +108,28 @@ class PreModel(nn.Module):
         return out_x, (mask_nodes, keep_nodes)
 
     def mask_attr_restoration(self, feat, epoch):
+        """Reconstruct the attributes of the masked nodes and calculate the loss."""
+
         cur_feat_mask_rate = self.get_mask_rate(self.feat_mask_rate, epoch=epoch)
-        # cur_feat_mask_rate = 0.0
         use_x, (mask_nodes, keep_nodes) = self.encoding_mask_noise(feat, cur_feat_mask_rate)
         enc_out = self.encoder(use_x)
         enc_out_mapped = self.encoder_to_decoder(enc_out)
         enc_out_mapped[mask_nodes] = 0  # TODO: learnable? remove?
         enc_out_mapped[mask_nodes] += self.dec_mask_token
+        # Obtain the central position information of the nodes.
         enc_out_mapped = self.center(feat, enc_out_mapped)
+
         feat_recon = self.decoder(enc_out_mapped)
 
-        # x_init = feat[mask_nodes]
-        # x_rec = feat_recon[mask_nodes]
-        x_init = feat
-        x_rec = feat_recon
+        x_init = feat[mask_nodes]
+        x_rec = feat_recon[mask_nodes]
         loss = self.attr_restoration_loss(x_rec, x_init)
 
         return loss, feat_recon, enc_out, mask_nodes
 
     def setup_loss_fn(self, loss_fn, alpha_l):
+        """Selection of loss function."""
+
         if loss_fn == "mse":
             criterion = nn.MSELoss()
         elif loss_fn == "sce":
@@ -138,5 +139,7 @@ class PreModel(nn.Module):
         return criterion
 
     def get_embeds(self, feats):
+        """encode the node features by encoder."""
+
         rep = self.encoder(feats)
         return rep.detach()

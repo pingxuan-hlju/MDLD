@@ -4,14 +4,18 @@ from torch.utils.data import Dataset, DataLoader
 
 
 def load_data():
-    lnc_dis = np.loadtxt(r"G:\Graduate student\Final\Graphormer_DRGCN_01\data\LNC\lnc_dis.txt", dtype=int)
-    dis_dis = np.loadtxt(r"G:\Graduate student\Final\Graphormer_DRGCN_01\data\LNC\dis_sim.txt", dtype=float)
-    mi_dis = np.loadtxt(r"G:\Graduate student\Final\Graphormer_DRGCN_01\data\LNC\mi_dis.txt", dtype=int)
-    lnc_mi = np.loadtxt(r"G:\Graduate student\Final\Graphormer_DRGCN_01\data\LNC\lnc_mi.txt", dtype=int)
+    """Load data"""
+
+    lnc_dis = np.loadtxt(r"G:\Graduate student\Final\MDLD\data\lnc_dis.txt", dtype=int)
+    dis_dis = np.loadtxt(r"G:\Graduate student\Final\MDLD\data\dis_sim.txt", dtype=float)
+    mi_dis = np.loadtxt(r"G:\Graduate student\Final\MDLD\data\mi_dis.txt", dtype=int)
+    lnc_mi = np.loadtxt(r"G:\Graduate student\Final\MDLD\data\lnc_mi.txt", dtype=int)
     return lnc_dis, dis_dis, mi_dis, lnc_mi
 
 
 def split_dataset(interaction):
+    """Split the data to get the training set, test set, and validation set"""
+
     positive_sample = np.argwhere(interaction == 1)
     np.random.shuffle(positive_sample)
     negative_sample = np.argwhere(interaction == 0)
@@ -35,26 +39,7 @@ def split_dataset(interaction):
         train_index.append(np.vstack((train_nodes[a])))
     train_index = np.array(train_index)
     val_index = np.array(val_index)
-    np.save('G:/Graduate student/Final/Graphormer_DRGCN_01/data/split_dataset/train_index.npy', train_index)
-    np.save('G:/Graduate student/Final/Graphormer_DRGCN_01/data/split_dataset/val_index.npy', val_index)
-    np.save('G:/Graduate student/Final/Graphormer_DRGCN_01/data/split_dataset/test_index.npy', test_index)
     return train_index, test_index, val_index
-
-
-def split_dataset_final(interaction):
-    positive_sample = np.argwhere(interaction == 1)
-    np.random.shuffle(positive_sample)
-    negative_sample = np.argwhere(interaction == 0)
-    np.random.shuffle(negative_sample)
-    train_index = np.vstack((positive_sample,
-                             negative_sample[0 * positive_sample.shape[0]]))
-    train_index = np.array(train_index)
-    test_index = []
-    for i in range(interaction.shape[0]):
-        for j in range(interaction.shape[1]):
-            test_index.append([i, j])
-    test_index = np.array(test_index)
-    return train_index, test_index
 
 
 class MyDataset(Dataset):
@@ -72,14 +57,14 @@ class MyDataset(Dataset):
 
 
 def create_feature_matrix(lnc_dis, dis_sim, mi_dis, lnc_mi, train_index, device):
+    """Construct the feature matrix."""
+
     copy_lnc_dis = np.zeros(shape=(lnc_dis.shape[0], lnc_dis.shape[1]), dtype=int)
     for i in range(train_index.shape[0]):
         if lnc_dis[train_index[i][0]][train_index[i][1]] == 1:
             copy_lnc_dis[train_index[i][0]][train_index[i][1]] = 1
     lnc_sim = calculate_sim(lnc_dis, dis_sim)
     mi_sim = calculate_sim(mi_dis, dis_sim)
-    # lnc_sim = np.zeros(shape=(240, 240))
-    # mi_sim = np.zeros(shape=(495, 495))
     row_1 = np.concatenate((lnc_sim, copy_lnc_dis, lnc_mi), axis=1)
     row_2 = np.concatenate((copy_lnc_dis.T, dis_sim, mi_dis.T), axis=1)
     row_3 = np.concatenate((lnc_mi.T, mi_dis, mi_sim), axis=1)
@@ -87,19 +72,9 @@ def create_feature_matrix(lnc_dis, dis_sim, mi_dis, lnc_mi, train_index, device)
     return torch.FloatTensor(features).to(device)
 
 
-def create_feature_matrix_final(lnc_dis, dis_sim, mi_dis, lnc_mi, device):
-    lnc_sim = calculate_sim(lnc_dis, dis_sim)
-    mi_sim = calculate_sim(mi_dis, dis_sim)
-    # lnc_sim = np.zeros(shape=(240, 240))
-    # mi_sim = np.zeros(shape=(495, 495))
-    row_1 = np.concatenate((lnc_sim, lnc_dis, lnc_mi), axis=1)
-    row_2 = np.concatenate((lnc_dis.T, dis_sim, mi_dis.T), axis=1)
-    row_3 = np.concatenate((lnc_mi.T, mi_dis, mi_sim), axis=1)
-    features = np.vstack((row_1, row_2, row_3))
-    return torch.FloatTensor(features).to(device)
-
-
 def calculate_sim(interaction, original_sim):
+    """Calculate the similarity of lncRNA(miRNA)"""
+
     target_sim = np.zeros(shape=(interaction.shape[0], interaction.shape[0]), dtype=float)
     for i in range(target_sim.shape[0]):
         for j in range(target_sim.shape[1]):

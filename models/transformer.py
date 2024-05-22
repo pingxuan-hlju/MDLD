@@ -3,8 +3,6 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-# # from .door import Door
-# from Graphormer_DRGCN_01.models.position import GraphAttnBias
 
 
 def clones(module, N):
@@ -97,16 +95,9 @@ class MultiHeadedAttention(nn.Module):
         self.linears = clones(nn.Linear(d_model, d_model), 4)
         self.attn = None
         self.dropout = nn.Dropout(p=dropout)
-        # init_parameters
-    #     self.apply(self.init_parameters)
-    #
-    # def init_parameters(self, module):
-    #     if isinstance(module, nn.Linear):
-    #         nn.init.xavier_uniform_(module.weight, gain=nn.init.calculate_gain('relu'))
-    #         nn.init.constant_(module.bias, 0)
 
     def forward(self, query, key, value):
-        """Implements Figure 2"""
+        """Implements MultiHeadedAttention"""
         # 1) Do all the linear projections in batch from d_model => h x d_k
         query, key, value = \
             [l(x).view(-1, self.h, self.d_k).transpose(0, 1)
@@ -129,19 +120,14 @@ class PositionwiseFeedForward(nn.Module):
         self.w_1 = nn.Linear(d_model, d_ff)
         self.w_2 = nn.Linear(d_ff, d_model)
         self.dropout = nn.Dropout(dropout)
-    #     self.init_parameters()
-    #
-    # def init_parameters(self):
-    #     nn.init.xavier_uniform_(self.w_1.weight, gain=nn.init.calculate_gain('relu'))
-    #     nn.init.constant_(self.w_1.bias, 0)
-    #     nn.init.xavier_uniform_(self.w_2.weight, gain=nn.init.calculate_gain('relu'))
-    #     nn.init.constant_(self.w_2.bias, 0)
 
     def forward(self, x):
         return self.w_2(self.dropout(F.relu(self.w_1(x))))
 
 
 def set_encoder_model(feature_dim, head_num, model_dim, dropout, layer_num) -> nn.Module:
+    """Implements encoder."""
+
     mod = nn.Sequential(
         nn.Linear(feature_dim, model_dim),
         nn.ReLU(),
@@ -154,6 +140,8 @@ def set_encoder_model(feature_dim, head_num, model_dim, dropout, layer_num) -> n
 
 
 def set_decoder_model(feature_dim, head_num, model_dim, dropout, layer_num) -> nn.Module:
+    """Implements decoder."""
+
     mod = nn.Sequential(
         Encoder(EncoderLayer(model_dim, MultiHeadedAttention(head_num, model_dim, dropout),
                              PositionwiseFeedForward(model_dim, model_dim * 4, dropout), dropout), layer_num),

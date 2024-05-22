@@ -2,6 +2,8 @@ import argparse
 
 
 def build_args():
+    """Set hyperparameters."""
+
     parser = argparse.ArgumentParser(description="LNC")
     parser.add_argument('--feature_dim', type=int, default=1140, help="number of feature dims")
     parser.add_argument('--model_dim', type=int, default=512, help="number of model dims")

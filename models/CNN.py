@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
-from torch.nn import init
 
 
 class CNN(nn.Module):
+    """Convolutional neural network."""
+
     def __init__(self, conv_w, conv_h, pool_w, pool_h):
         super(CNN, self).__init__()
         self.conv1 = nn.Sequential(
@@ -16,15 +17,6 @@ class CNN(nn.Module):
             nn.LeakyReLU(),
             nn.MaxPool2d(kernel_size=(pool_w, pool_h)),  # 池化盒（1，6）
         )
-
-    #     self.initialize_weights()
-    #
-    # def initialize_weights(self):
-    #     for module in self.modules():
-    #         if isinstance(module, nn.Conv2d):
-    #             init.xavier_uniform_(module.weight.data, gain=nn.init.calculate_gain('leaky_relu'))
-    #             if module.bias is not None:
-    #                 init.constant_(module.bias.data, 0.0)
 
     def forward(self, x):
         x = self.conv1(x)

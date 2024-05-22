@@ -6,6 +6,8 @@ from torch.nn import init
 
 
 class GCN_conv(nn.Module):
+    """Single GCN layer."""
+
     def __init__(self, in_ft, out_ft, bias=True):
         super(GCN_conv, self).__init__()
 
@@ -44,15 +46,17 @@ class GCN(nn.Module):
         re = feat
         feat = self.feat_fc(feat)
         feat_conv1 = self.gcn_layer1(feat, adj_hat)
-        feat_conv1 = feat_conv1+feat
+        feat_conv1 = feat_conv1 + feat
         feat_conv2 = self.gcn_layer2(feat_conv1, adj_hat)
-        feat_conv2 = feat_conv2+feat_conv1
+        feat_conv2 = feat_conv2 + feat_conv1
         feat_conv = torch.cat((feat_conv2, re), dim=1)
 
         return feat_conv
 
 
 class GCNDR(nn.Module):
+    """Implements GCN with dynamic residuals"""
+
     def __init__(
             self,
             in_feats,
@@ -88,7 +92,6 @@ class GCNDR(nn.Module):
         self.gru = nn.GRU(n_hidden, 1, 2, dropout=dropout)
         self.feat_fc = nn.Linear(1140, 512)
 
-        # 初始化GRU权重参数
         for name, param in self.gru.named_parameters():
             if 'weight' in name:
                 init.xavier_normal_(param)
@@ -111,39 +114,20 @@ class GCNDR(nn.Module):
         h = F.dropout(h, p=self.dropout, training=self.training)
         _hidden.append(h)
         for i in range(0, self.n_layers):
-        #     h = self.convs[i](h, adj_hat)
-        #     h = F.leaky_relu(h)
-        #     h = F.dropout(h, p=self.dropout, training=self.training)
-        #     # _hidden.append(h)
-        #     h1 = F.normalize(_hidden[i], p=2, dim=1)
-        #     hl = F.normalize(h, p=2, dim=1)
-        #     # h_mul = torch.mul(h1, hl)
-        #     # alpha_out = torch.sum(h_mul, dim=1).reshape(1140, 1)
-        #     alpha_out = torch.nn.functional.cosine_similarity(h1, hl, dim=1).reshape(1140, 1).unsqueeze(0)
-        #     # h_mul_fc = self.alpha_fc(h_mul)
-        #     # alpha_out = h_mul_fc
-        #     # alpha_out, (h_hidden, c_hidden) = self.lstm(h_mul_fc, (h_hidden, c_hidden))
-        #     alpha_out, (h_hidden) = self.gru(alpha_out, h_hidden)
-        #     # alpha_out = torch.abs(alpha_out)
-        #     alpha_out = F.sigmoid(alpha_out)
-        #     alpha_evo = alpha_out.squeeze(0)
-        #
-        #     h = (1 - alpha_evo) * h + alpha_evo * _hidden[i]
-        #     # h = F.relu(self.norms[i](h))
-        #     # h = F.dropout(h, p=self.dropout, training=self.training)
-        #     _hidden.append(h)
-        # h = torch.cat((h, feat), dim=1)
+            # GCN encoding
             h = self.convs[i](h, adj_hat)
             h = F.leaky_relu(h)
             h = F.dropout(h, p=self.dropout, training=self.training)
+            # Mean L2 regularization
             h1 = F.normalize(_hidden[i], p=2, dim=1)
             hl = F.normalize(h, p=2, dim=1)
             h_mul = torch.mul(h1, hl).unsqueeze(0)
             h_mul_fc = self.alpha_fc(h_mul)
+            # Evolution of residual weights
             alpha_out, (h_hidden) = self.gru(h_mul_fc, h_hidden)
             alpha_out = torch.abs(alpha_out)
             alpha_evo = alpha_out.squeeze(0)
-
+            # Fusion of feature representations from adjacent layers
             h = (1 - alpha_evo) * h + alpha_evo * _hidden[i]
             _hidden.append(h)
         h = torch.cat((h, feat), dim=1)
