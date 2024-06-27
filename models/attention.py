@@ -46,7 +46,7 @@ class Attention(nn.Module):
         self.dropout = nn.Dropout(0.1)
 
     def forward(self, ld_gcn, ld_encoder, x, y):
-        """Follow Figure 4 (left) for connections."""
+        """Follow Figure 4 for connections."""
 
         feature_gcn = ld_gcn
         feature_encoder = ld_encoder

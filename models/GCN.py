@@ -121,6 +121,7 @@ class GCNDR(nn.Module):
             # Mean L2 regularization
             h1 = F.normalize(_hidden[i], p=2, dim=1)
             hl = F.normalize(h, p=2, dim=1)
+            # Calculate the residual weights
             h_mul = torch.mul(h1, hl).unsqueeze(0)
             h_mul_fc = self.alpha_fc(h_mul)
             # Evolution of residual weights
